@@ -1,6 +1,7 @@
-# MoonRoster 项目申报说明
+# 星序 Xingxu 项目申报说明
 
-**项目名称：**MoonRoster——课程与共享场地排程工具  
+**项目名称：**星序 Xingxu（MoonRoster）——课程与共享场地排程工具
+
 **项目仓库：**https://github.com/2515050242/moonroster  
 **主要语言：**MoonBit  
 **许可证：**Apache-2.0
