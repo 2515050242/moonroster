@@ -120,5 +120,58 @@ test "an empty candidate set is impossible" {
   let input =
     #|{"rooms":[{"id":"r","name":"R","capacity":40}],"slots":[{"id":"a","name":"A"}],
     #|"courses":[{"id":"c","name":"C","teacher":"t","group":"g","size":20,"allowed_slots":[]}],"node_limit":50}
-  assert_true(result(input) is { "status": "unsatisfiable", .. })
+  assert_true(
+    result(input)
+    is {
+      "status": "unsatisfiable",
+      "message": "课程 c 没有允许的时间段。",
+      ..
+    },
+  )
+}
+
+///|
+test "explains a locked slot outside the allowed set" {
+  let input =
+    #|{"rooms":[{"id":"r","name":"R","capacity":40}],"slots":[{"id":"a","name":"A"},{"id":"b","name":"B"}],
+    #|"courses":[{"id":"c","name":"C","teacher":"t","group":"g","size":20,"allowed_slots":["a"],"locked_slot":"b"}],"node_limit":50}
+  assert_true(
+    result(input)
+    is {
+      "status": "unsatisfiable",
+      "message": "课程 c 锁定的时间段不在允许范围内。",
+      ..
+    },
+  )
+}
+
+///|
+test "explains conflicting locked teachers" {
+  let input =
+    #|{"rooms":[{"id":"r1","name":"R1","capacity":40},{"id":"r2","name":"R2","capacity":40}],"slots":[{"id":"a","name":"A"}],
+    #|"courses":[{"id":"c1","name":"C1","teacher":"t","group":"g1","size":20,"allowed_slots":["a"],"locked_slot":"a"},
+    #|{"id":"c2","name":"C2","teacher":"t","group":"g2","size":20,"allowed_slots":["a"],"locked_slot":"a"}],"node_limit":50}
+  assert_true(
+    result(input)
+    is {
+      "status": "unsatisfiable",
+      "message": "课程 c1 和 c2 将同一教师锁定在同一时间段。",
+      ..
+    },
+  )
+}
+
+///|
+test "explains inadequate locked room capacity" {
+  let input =
+    #|{"rooms":[{"id":"r","name":"R","capacity":10}],"slots":[{"id":"a","name":"A"}],
+    #|"courses":[{"id":"c","name":"C","teacher":"t","group":"g","size":20,"allowed_slots":["a"],"locked_room":"r"}],"node_limit":50}
+  assert_true(
+    result(input)
+    is {
+      "status": "unsatisfiable",
+      "message": "课程 c 锁定的教室 r 容量不足。",
+      ..
+    },
+  )
 }

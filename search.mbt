@@ -1,4 +1,50 @@
 ///|
+fn diagnose(s : Search) -> String? {
+  for index, course in s.problem.courses {
+    if candidates(s, index).is_empty() {
+      if course.allowed_slots.is_empty() {
+        return Some("课程 \{course.id} 没有允许的时间段。")
+      }
+      if course.locked_slot is Some(id) && !course.allowed_slots.contains(id) {
+        return Some(
+          "课程 \{course.id} 锁定的时间段不在允许范围内。",
+        )
+      }
+      if course.locked_room is Some(id) {
+        return Some("课程 \{course.id} 锁定的教室 \{id} 容量不足。")
+      }
+      return Some("课程 \{course.id} 没有容量足够的教室。")
+    }
+    for other_index in 0..<index {
+      let other = s.problem.courses[other_index]
+      match (course.locked_slot, other.locked_slot) {
+        (Some(a), Some(b)) if a == b => {
+          if course.teacher == other.teacher {
+            return Some(
+              "课程 \{other.id} 和 \{course.id} 将同一教师锁定在同一时间段。",
+            )
+          }
+          if course.group == other.group {
+            return Some(
+              "课程 \{other.id} 和 \{course.id} 将同一班级锁定在同一时间段。",
+            )
+          }
+          match (course.locked_room, other.locked_room) {
+            (Some(first), Some(second)) if first == second =>
+              return Some(
+                "课程 \{other.id} 和 \{course.id} 锁定了同一时间段的同一教室。",
+              )
+            _ => ()
+          }
+        }
+        _ => ()
+      }
+    }
+  }
+  None
+}
+
+///|
 fn candidates(s : Search, course_index : Int32) -> Array[Placement] {
   let course = s.problem.courses[course_index]
   let result : Array[Placement] = []

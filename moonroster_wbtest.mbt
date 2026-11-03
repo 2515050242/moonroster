@@ -117,6 +117,9 @@ test "small problems agree with exhaustive enumeration" {
       nodes: 0,
       truncated: false,
     }
+    if diagnose(search) is Some(_) {
+      assert_false(reference_exists(problem))
+    }
     let found = solve(search, 0)
     assert_eq(found, reference_exists(problem))
     assert_false(search.truncated)

@@ -8,7 +8,7 @@ repository = ""
 
 license = "Apache-2.0"
 
-keywords = ["scheduling", "timetable", "constraint"]
+keywords = [ "scheduling", "timetable", "constraint" ]
 
 preferred_target = "wasm"
 

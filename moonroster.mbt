@@ -82,6 +82,10 @@ pub fn solve_json(input : String) -> String {
     nodes: 0,
     truncated: false,
   }
+  match diagnose(search) {
+    Some(message) => return response("unsatisfiable", message, 0, [])
+    None => ()
+  }
   if solve(search, 0) {
     let placements : Array[Json] = []
     for item in search.assigned {
@@ -97,18 +101,23 @@ pub fn solve_json(input : String) -> String {
         None => ()
       }
     }
-    response("ok", "A feasible timetable was found.", search.nodes, placements)
+    response(
+      "ok",
+      "已找到满足约束的排程。",
+      search.nodes,
+      placements,
+    )
   } else if search.truncated {
     response(
       "unknown",
-      "Search limit reached; feasibility is unknown.",
+      "已达到搜索上限，尚无法判断是否存在可行排程。",
       search.nodes,
       [],
     )
   } else {
     response(
       "unsatisfiable",
-      "No timetable satisfies the given constraints.",
+      "给定约束下不存在可行排程；请检查时段、教室和锁定条件。",
       search.nodes,
       [],
     )
