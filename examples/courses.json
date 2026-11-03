@@ -1,0 +1,17 @@
+{
+  "rooms": [
+    {"id": "room-101", "name": "教学楼 101", "capacity": 40},
+    {"id": "room-202", "name": "研讨室 202", "capacity": 20}
+  ],
+  "slots": [
+    {"id": "mon-am", "name": "周一上午"},
+    {"id": "mon-pm", "name": "周一下午"},
+    {"id": "tue-am", "name": "周二上午"}
+  ],
+  "courses": [
+    {"id": "db", "name": "数据库原理", "teacher": "李老师", "group": "计科一班", "size": 35, "allowed_slots": ["mon-am", "mon-pm"]},
+    {"id": "algo", "name": "算法设计", "teacher": "李老师", "group": "计科二班", "size": 18, "allowed_slots": ["mon-am", "mon-pm", "tue-am"]},
+    {"id": "se", "name": "软件工程", "teacher": "王老师", "group": "计科一班", "size": 35, "allowed_slots": ["mon-pm", "tue-am"], "locked_slot": "tue-am"}
+  ],
+  "node_limit": 10000
+}

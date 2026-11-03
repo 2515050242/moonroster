@@ -1,0 +1,16 @@
+{
+  "rooms": [
+    {"id": "hall", "name": "活动室", "capacity": 50},
+    {"id": "meeting", "name": "会议室", "capacity": 12}
+  ],
+  "slots": [
+    {"id": "fri-1", "name": "周五第一时段"},
+    {"id": "fri-2", "name": "周五第二时段"}
+  ],
+  "courses": [
+    {"id": "talk", "name": "技术分享", "teacher": "负责人 A", "group": "技术组", "size": 35, "allowed_slots": ["fri-1", "fri-2"]},
+    {"id": "meeting", "name": "志愿者会议", "teacher": "负责人 B", "group": "志愿者组", "size": 8, "allowed_slots": ["fri-1"]},
+    {"id": "rehearsal", "name": "活动彩排", "teacher": "负责人 A", "group": "志愿者组", "size": 10, "allowed_slots": ["fri-1", "fri-2"]}
+  ],
+  "node_limit": 10000
+}

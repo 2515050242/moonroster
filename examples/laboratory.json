@@ -1,0 +1,16 @@
+{
+  "rooms": [
+    {"id": "lab-a", "name": "实验室 A", "capacity": 24},
+    {"id": "lab-b", "name": "实验室 B", "capacity": 12}
+  ],
+  "slots": [
+    {"id": "wed-am", "name": "周三上午"},
+    {"id": "wed-pm", "name": "周三下午"}
+  ],
+  "courses": [
+    {"id": "network", "name": "网络实验", "teacher": "陈老师", "group": "甲组", "size": 20, "allowed_slots": ["wed-am", "wed-pm"], "locked_room": "lab-a"},
+    {"id": "system", "name": "系统实验", "teacher": "周老师", "group": "乙组", "size": 10, "allowed_slots": ["wed-am", "wed-pm"]},
+    {"id": "review", "name": "实验答疑", "teacher": "陈老师", "group": "乙组", "size": 10, "allowed_slots": ["wed-am", "wed-pm"]}
+  ],
+  "node_limit": 10000
+}
