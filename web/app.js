@@ -20,7 +20,9 @@ const example = {
   ],
   node_limit: 100000,
 };
-let engine;
+let worker;
+let running = false;
+let submittedData;
 let lastResult;
 let formData;
 
@@ -30,10 +32,15 @@ function notice(message, kind = '') {
 }
 
 function parseInput() {
+  if (input.value.length > 262144) throw new Error('输入过大，最多支持 262144 个 UTF-16 码元。');
   return JSON.parse(input.value);
 }
 
 function resetResult() {
+  if (running) {
+    stopCalculation();
+    notice('输入已更改，原计算已取消。');
+  }
   lastResult = undefined;
   $('#empty-state').hidden = false;
   $('#result-content').hidden = true;
@@ -131,6 +138,7 @@ function renderForm() {
     formData = parseInput();
     if (!formData || typeof formData !== 'object' || !['rooms', 'slots', 'courses'].every((key) => Array.isArray(formData[key]))) throw new Error('请提供 rooms、slots 和 courses 数组。');
     if (![...formData.rooms, ...formData.slots, ...formData.courses].every((item) => item && typeof item === 'object' && typeof item.id === 'string')) throw new Error('每条记录都需要字符串 id。');
+    if (formData.rooms.length > 16 || formData.slots.length > 64 || formData.courses.length > 64) throw new Error('最多支持 16 个场地、64 个时段和 64 项课程。');
   } catch (error) {
     target.appendChild(element('p', `无法显示表单：${error.message} 请在高级 JSON 中修正。`, 'form-error'));
     return;
@@ -269,16 +277,25 @@ $('#format-input').addEventListener('click', () => {
 $('#file-input').addEventListener('change', async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
-  try { setInput(JSON.parse(await file.text())); notice('文件已导入。'); }
+  try {
+    if (file.size > 1048576) throw new Error('文件不能超过 1 MiB。');
+    const text = await file.text();
+    if (text.length > 262144) throw new Error('输入不能超过 262144 个 UTF-16 码元。');
+    setInput(JSON.parse(text)); notice('文件已导入。');
+  }
   catch (error) { notice(`无法读取 JSON：${error.message}`, 'error'); }
   event.target.value = '';
 });
 runButton.addEventListener('click', () => {
   try {
     const data = parseInput();
-    const result = JSON.parse(engine(JSON.stringify(data)));
-    updateResult(result, data);
-    notice('排程已结束，请查看结果。');
+    resetResult();
+    submittedData = data;
+    running = true;
+    runButton.disabled = true;
+    $('#cancel').hidden = false;
+    notice('正在搜索，可以取消；修改输入也会停止本次计算。');
+    worker.postMessage(input.value);
   } catch (error) { notice(`无法运行：${error.message}`, 'error'); }
 });
 $('#copy-result').addEventListener('click', async () => {
@@ -289,14 +306,56 @@ $('#download-result').addEventListener('click', () => {
   downloadJson(lastResult, 'moonroster-result.json');
 });
 
-setInput(example);
-try {
-  const module = await import('../_build/js/release/build/cmd/web/web.js');
-  if (typeof module.solve_json !== 'function') throw new Error('缺少排程入口');
-  engine = module.solve_json;
-  runButton.disabled = false;
-  notice('排程引擎已就绪。');
-} catch (error) {
-  notice('排程引擎未加载。请先运行 moon build cmd/web --target js --release，再刷新页面。', 'error');
-  console.error('Unable to load the MoonBit engine:', error);
+function startWorker(announce = true) {
+  runButton.disabled = true;
+  try {
+    const current = new Worker('./solver-worker.js', { type: 'module' });
+    worker = current;
+    current.onmessage = ({ data }) => {
+      if (worker !== current) return;
+      if (data.ready) {
+        runButton.disabled = false;
+        if (announce) notice('排程引擎已就绪。');
+        return;
+      }
+      if (!running) return;
+      running = false;
+      runButton.disabled = false;
+      $('#cancel').hidden = true;
+      if (data.error) notice(data.error, 'error');
+      else {
+        updateResult(data.result, submittedData);
+        notice('排程已结束，请查看结果。');
+      }
+      submittedData = undefined;
+    };
+    current.onerror = (event) => {
+      event.preventDefault();
+      if (worker !== current) return;
+      current.terminate();
+      running = false;
+      submittedData = undefined;
+      runButton.disabled = true;
+      $('#cancel').hidden = true;
+      notice('引擎未能运行。请确认构建成功后刷新页面。', 'error');
+    };
+  } catch {
+    notice('当前浏览器无法启动后台计算，请使用支持 Web Worker 的浏览器。', 'error');
+  }
 }
+
+function stopCalculation() {
+  worker?.terminate();
+  running = false;
+  submittedData = undefined;
+  $('#cancel').hidden = true;
+  startWorker(false);
+}
+
+$('#cancel').addEventListener('click', () => {
+  stopCalculation();
+  notice('计算已取消，不能据此判断有解或无解。');
+});
+
+setInput(example);
+startWorker();

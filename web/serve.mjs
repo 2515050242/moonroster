@@ -7,6 +7,7 @@ const files = new Map([
   ['/web/index.html', [new URL('./index.html', import.meta.url), 'text/html; charset=utf-8']],
   ['/web/style.css', [new URL('./style.css', import.meta.url), 'text/css; charset=utf-8']],
   ['/web/app.js', [new URL('./app.js', import.meta.url), 'text/javascript; charset=utf-8']],
+  ['/web/solver-worker.js', [new URL('./solver-worker.js', import.meta.url), 'text/javascript; charset=utf-8']],
   ['/_build/js/release/build/cmd/web/web.js', [new URL('../_build/js/release/build/cmd/web/web.js', import.meta.url), 'text/javascript; charset=utf-8']],
 ]);
 
