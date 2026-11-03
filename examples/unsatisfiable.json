@@ -1,0 +1,1 @@
+{"rooms":[{"id":"r","name":"Room","capacity":1}],"slots":[{"id":"s","name":"Slot"}],"courses":[{"id":"c","name":"Course","teacher":"t","group":"g","size":2,"allowed_slots":["s"]}],"node_limit":100}

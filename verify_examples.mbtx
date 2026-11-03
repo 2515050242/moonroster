@@ -1,0 +1,58 @@
+----
+import {
+  "moonbitlang/core/async",
+  "moonbitlang/core/async/shell",
+  "moonbitlang/core/async/fs",
+  "moonbitlang/core/json",
+}
+----
+
+// Independent check of the public JSON output against each shipped fixture.
+async fn main {
+  for (name, expected, code) in [
+    ("courses", "ok", 0), ("laboratory", "ok", 0), ("activities", "ok", 0),
+    ("unsatisfiable", "unsatisfiable", 1), ("unknown", "unknown", 3), ("invalid", "invalid", 2),
+  ] {
+    let path = "examples/\{name}.json"
+    let output = @shell.Cmd("node", ["cmd/solve.mjs", path]).output()
+    assert_eq(output.exit_code(), code)
+    assert_eq(output.stderr(), "")
+    let result = @json.parse(output.stdout())
+    guard result is { "status": String(status), "assignments": Array(assignments), .. } else { fail("Invalid response") }
+    assert_eq(status, expected)
+    if status == "ok" {
+      let input = @json.parse(@fs.read_text(path))
+      guard input is { "courses": Array(courses), "rooms": Array(rooms), "slots": Array(slots), .. } else { fail("Invalid fixture") }
+      assert_eq(assignments.length(), courses.length())
+      let seen : Map[String, Bool] = Map([])
+      let occupied : Array[(String, String, String, String)] = []
+      for item in assignments {
+        guard item is { "course": String(id), "slot": String(slot), "room": String(room), .. } else { fail("Invalid assignment") }
+        assert_false(seen.contains(id))
+        seen[id] = true
+        let mut course : Json? = None
+        for candidate in courses {
+          if candidate is { "id": String(value), .. } && value == id { course = Some(candidate) }
+        }
+        guard course is Some({ "teacher": String(teacher), "group": String(group), "size": Number(size, ..), "allowed_slots": Array(allowed), .. } as course) else { fail("Unknown course") }
+        assert_true(allowed.contains(Json(slot)))
+        assert_true(slots.any(s => s is { "id": String(value), .. } && value == slot))
+        assert_true(rooms.any(r => r is { "id": String(value), "capacity": Number(capacity, ..), .. } && value == room && capacity >= size))
+        if course is { "locked_slot": String(locked), .. } { assert_eq(slot, locked) }
+        if course is { "locked_room": String(locked), .. } { assert_eq(room, locked) }
+        for (other_slot, other_room, other_teacher, other_group) in occupied {
+          assert_false(slot == other_slot && (room == other_room || teacher == other_teacher || group == other_group))
+        }
+        occupied.push((slot, room, teacher, group))
+      }
+    } else { assert_true(assignments.is_empty()) }
+    println("\{name}: \{status} verified")
+  }
+  let missing = @shell.Cmd("node", ["cmd/solve.mjs", "examples/does-not-exist.json"]).output()
+  assert_eq(missing.exit_code(), 74)
+  assert_eq(missing.stdout(), "")
+  assert_false(missing.stderr().contains("does-not-exist"))
+  let usage = @shell.Cmd("node", ["cmd/solve.mjs"]).output()
+  assert_eq(usage.exit_code(), 64)
+  println("CLI errors verified")
+}

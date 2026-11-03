@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Install MoonBit
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
@@ -28,3 +31,5 @@ jobs:
         run: moon build cmd/web --target js --release
       - name: Run example
         run: moon run cmd/main
+      - name: Verify file CLI and shipped scenarios
+        run: moon run verify_examples.mbtx --deny-warn
