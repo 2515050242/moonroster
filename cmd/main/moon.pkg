@@ -1,0 +1,5 @@
+import {
+  "2515050242/moonroster" @roster,
+}
+
+pkgtype(kind: "executable")
