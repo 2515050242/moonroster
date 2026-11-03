@@ -1,17 +1,20 @@
 ///|
+#derive(FromJson)
 priv struct Room {
   id : String
   name : String
   capacity : Int32
-} derive(FromJson)
+}
 
 ///|
+#derive(FromJson)
 priv struct Slot {
   id : String
   name : String
-} derive(FromJson)
+}
 
 ///|
+#derive(FromJson)
 priv struct Course {
   id : String
   name : String
@@ -21,15 +24,16 @@ priv struct Course {
   allowed_slots : Array[String]
   locked_slot : String?
   locked_room : String?
-} derive(FromJson)
+}
 
 ///|
+#derive(FromJson)
 priv struct Problem {
   rooms : Array[Room]
   slots : Array[Slot]
   courses : Array[Course]
   node_limit : Int32
-} derive(FromJson)
+}
 
 ///|
 priv struct Placement {
@@ -66,8 +70,24 @@ fn response(
 /// Solve a small timetable from JSON. Assignments use the supplied identifiers.
 /// A node limit reports `unknown` rather than claiming the problem is impossible.
 pub fn solve_json(input : String) -> String {
-  let json = @json.parse(input) catch {
+  if input.length() > 262144 {
+    return response(
+      "invalid",
+      "输入不能超过 262144 个 UTF-16 码元。",
+      0,
+      [],
+    )
+  }
+  let json = @json.parse(input, max_nesting_depth=16) catch {
     _ => return response("invalid", "Invalid JSON.", 0, [])
+  }
+  if !valid_numbers(json) {
+    return response(
+      "invalid",
+      "搜索上限、容量和人数必须是范围内的正整数。",
+      0,
+      [],
+    )
   }
   let problem : Problem = @json.from_json(json) catch {
     _ => return response("invalid", "Invalid input fields or types.", 0, [])
