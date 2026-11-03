@@ -41,7 +41,7 @@ fn diagnose(s : Search) -> String? {
       }
     }
   }
-  None
+  matching_diagnosis(s)
 }
 
 ///|

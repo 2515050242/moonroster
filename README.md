@@ -46,6 +46,8 @@ node cmd/solve.mjs examples/activities.json
 
 高级 JSON 格式与表单同步，参考 [课程示例](examples/courses.json)。`allowed_slots` 存放时段 ID；`locked_slot`、`locked_room` 可省略。ID 在各自类型内必须唯一。请使用 UTF-8 文件。
 
+锁定字段也可填写 `null`，表示不固定。核心在搜索前检查教师、班级及场地的资源匹配，能直接解释部分可用时段或场地不足；预检通过后仍需搜索，可能返回 `unknown`。
+
 ## 结果如何理解
 
 | 状态 | 含义 |
