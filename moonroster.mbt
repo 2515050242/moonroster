@@ -89,6 +89,7 @@ pub fn solve_json(input : String) -> String {
       [],
     )
   }
+  normalize_locks(json)
   let problem : Problem = @json.from_json(json) catch {
     _ => return response("invalid", "Invalid input fields or types.", 0, [])
   }

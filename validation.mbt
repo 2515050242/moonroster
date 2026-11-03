@@ -102,6 +102,23 @@ fn clean_text(value : String) -> Bool {
 }
 
 ///|
+// An absent lock and an explicit JSON null both mean "not locked".
+// Derived optional record fields otherwise try to decode null as a String.
+fn normalize_locks(value : Json) -> Unit {
+  if value is { "courses": Array(courses), .. } {
+    for course in courses {
+      if course is Object(fields) {
+        for key in ["locked_slot", "locked_room"] {
+          if fields.get(key) is Some(Null) {
+            ignore(fields.remove(key))
+          }
+        }
+      }
+    }
+  }
+}
+
+///|
 // Validate before FromJson, whose integer conversion can truncate fractions.
 fn positive_integer(value : Json, upper : Double) -> Bool {
   value is Number(n, ..) && n >= 1 && n <= upper && n.to_int().to_double() == n
