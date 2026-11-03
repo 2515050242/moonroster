@@ -1,0 +1,11 @@
+import {
+  "2515050242/moonroster" @roster,
+}
+
+supported_targets = "js"
+
+pkgtype(kind: "foreign_library")
+
+options(
+  link: { "js": { "format": "esm" } },
+)
