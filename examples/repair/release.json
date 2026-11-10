@@ -1,0 +1,100 @@
+{
+  "horizon": 4,
+  "resources": [
+    {
+      "id": "runner",
+      "capacity": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "id": "approval",
+      "capacity": [
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "build",
+      "options": [
+        {
+          "start": 0,
+          "end": 2,
+          "demands": [
+            {
+              "resource": "runner",
+              "units": 2
+            }
+          ]
+        }
+      ],
+      "baseline": 0,
+      "frozen": true,
+      "change_cost": 8,
+      "after": []
+    },
+    {
+      "id": "deploy",
+      "options": [
+        {
+          "start": 1,
+          "end": 2,
+          "demands": [
+            {
+              "resource": "runner",
+              "units": 1
+            },
+            {
+              "resource": "approval",
+              "units": 1
+            }
+          ]
+        },
+        {
+          "start": 2,
+          "end": 3,
+          "demands": [
+            {
+              "resource": "runner",
+              "units": 1
+            },
+            {
+              "resource": "approval",
+              "units": 1
+            }
+          ]
+        }
+      ],
+      "baseline": 0,
+      "frozen": false,
+      "change_cost": 4,
+      "after": [
+        "build"
+      ]
+    },
+    {
+      "id": "notice",
+      "options": [
+        {
+          "start": 3,
+          "end": 4,
+          "demands": []
+        }
+      ],
+      "baseline": 0,
+      "frozen": false,
+      "change_cost": 2,
+      "after": [
+        "deploy"
+      ]
+    }
+  ],
+  "budget": 1000
+}

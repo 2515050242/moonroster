@@ -55,4 +55,22 @@ async fn main {
   let usage = @shell.Cmd("node", ["cmd/solve.mjs"]).output()
   assert_eq(usage.exit_code(), 64)
   println("CLI errors verified")
+  for (name, choices, cost) in [
+    ("equipment", [0, 1], 3), ("release", [0, 1, 0], 4), ("dispatch", [1, 0], 2),
+  ] {
+    let path = "examples/repair/\{name}.json"
+    let result = @shell.Cmd("node", ["cmd/solve.mjs", "--repair", path]).output()
+    assert_eq(result.exit_code(), 0)
+    let answer = @json.parse(result.stdout())
+    guard answer is { "status": "optimal", "choices": actual, "cost": actual_cost, .. } else { fail("Missing optimal repair") }
+    assert_eq(actual, Json(choices))
+    assert_eq(actual_cost, Json(cost))
+    println("repair \{name}: optimum \{cost} verified")
+  }
+  let audit = @shell.Cmd("node", [
+    "cmd/solve.mjs", "--audit", "examples/repair/dispatch.json", "examples/repair/dispatch-baseline.json",
+  ]).output()
+  assert_eq(audit.exit_code(), 1)
+  assert_true(@json.parse(audit.stdout()) is { "status": "conflict", "resource": "dock", "tick": 0, "used": 2, "available": 1, .. })
+  println("repair audit witness verified")
 }

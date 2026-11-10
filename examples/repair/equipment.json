@@ -1,0 +1,91 @@
+{
+  "horizon": 4,
+  "resources": [
+    {
+      "id": "scope-main",
+      "capacity": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "scope-backup",
+      "capacity": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "technician",
+      "capacity": [
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "calibration",
+      "options": [
+        {
+          "start": 0,
+          "end": 2,
+          "demands": [
+            {
+              "resource": "technician",
+              "units": 1
+            }
+          ]
+        }
+      ],
+      "baseline": 0,
+      "frozen": true,
+      "change_cost": 9,
+      "after": []
+    },
+    {
+      "id": "sample-analysis",
+      "options": [
+        {
+          "start": 0,
+          "end": 2,
+          "demands": [
+            {
+              "resource": "scope-main",
+              "units": 1
+            },
+            {
+              "resource": "technician",
+              "units": 1
+            }
+          ]
+        },
+        {
+          "start": 2,
+          "end": 4,
+          "demands": [
+            {
+              "resource": "scope-backup",
+              "units": 1
+            },
+            {
+              "resource": "technician",
+              "units": 1
+            }
+          ]
+        }
+      ],
+      "baseline": 0,
+      "frozen": false,
+      "change_cost": 3,
+      "after": []
+    }
+  ],
+  "budget": 1000
+}

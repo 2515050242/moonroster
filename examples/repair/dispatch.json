@@ -1,0 +1,100 @@
+{
+  "horizon": 4,
+  "resources": [
+    {
+      "id": "dock",
+      "capacity": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "loaders",
+      "capacity": [
+        2,
+        2,
+        2,
+        2
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "routine",
+      "options": [
+        {
+          "start": 0,
+          "end": 1,
+          "demands": [
+            {
+              "resource": "dock",
+              "units": 1
+            },
+            {
+              "resource": "loaders",
+              "units": 1
+            }
+          ]
+        },
+        {
+          "start": 1,
+          "end": 2,
+          "demands": [
+            {
+              "resource": "dock",
+              "units": 1
+            },
+            {
+              "resource": "loaders",
+              "units": 1
+            }
+          ]
+        }
+      ],
+      "baseline": 0,
+      "frozen": false,
+      "change_cost": 2,
+      "after": []
+    },
+    {
+      "id": "priority",
+      "options": [
+        {
+          "start": 0,
+          "end": 1,
+          "demands": [
+            {
+              "resource": "dock",
+              "units": 1
+            },
+            {
+              "resource": "loaders",
+              "units": 2
+            }
+          ]
+        },
+        {
+          "start": 2,
+          "end": 3,
+          "demands": [
+            {
+              "resource": "dock",
+              "units": 1
+            },
+            {
+              "resource": "loaders",
+              "units": 2
+            }
+          ]
+        }
+      ],
+      "baseline": 0,
+      "frozen": false,
+      "change_cost": 9,
+      "after": []
+    }
+  ],
+  "budget": 1000
+}

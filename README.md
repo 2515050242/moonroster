@@ -1,12 +1,24 @@
-# 星序 Xingxu（MoonRoster）
+# 星序 Xingxu · 多资源计划修复库
 
-MoonRoster 是一个面向小规模课程和共享场地的离线排程工具。填写课程、人员、班级、时间和教室后，它会搜索满足条件的安排；也可锁定已经确定的时间或教室，再为其他课程安排位置。
+星序的 `repair` 包用于修复已发布但受资源故障、容量变化或依赖冲突影响的计划。输入原方案、冻结任务、可选调整及改动成本，库返回可行的调整清单。完整搜索结束后给出最低成本，搜索受限时报告已找到的方案及成本下界。
 
-适用场景包括课程排课、实验室活动和社团活动。浏览器里的输入与结果只在本机处理；使用示例中的姓名与安排均为虚构数据。
+资源由调用者定义，可以是机器、人员、算力或装卸能力。每个资源有逐时容量，每个选项可以同时占用多种资源。校验接口也可单独检查外部给出的安排，指出冻结、前置依赖或容量冲突。
 
-## 快速开始
+## 运行计划修复
 
-需要 [MoonBit 工具链](https://www.moonbitlang.cn/download/)和 Node.js 20 或更新版本。本轮验证使用 moon 0.1.20261102、moonc v0.10.19；请使用相同或更新的稳定版。安装好后，在项目根目录运行：
+```sh
+moon build cmd/web --target js --release
+node cmd/solve.mjs --repair examples/repair/equipment.json
+node cmd/solve.mjs --repair examples/repair/release.json
+node cmd/solve.mjs --repair examples/repair/dispatch.json
+node cmd/solve.mjs --audit examples/repair/dispatch.json examples/repair/dispatch-baseline.json
+```
+
+三个示例分别覆盖设备故障时改用备用设备、软件发布前置任务延迟、码头争抢时优先保留高代价订单。审计命令复核码头原方案，预期返回容量冲突和退出码 1。使用 [接口、示例结果和限制](docs/repair.md) 接入其他 MoonBit 工程。
+
+## 原有课程排程应用
+
+两个入口均需要 MoonBit 工具链和 Node.js 20 或更新版本。本轮验证使用 moon 0.1.20261104、moonc v0.10.20。课表网页继续使用原格式，示例为虚构数据。安装后在项目根目录运行：
 
 ```sh
 moon build cmd/web --target js --release

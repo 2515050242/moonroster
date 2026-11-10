@@ -1,5 +1,17 @@
 # 相关项目
 
+## 计划修复方向（2026-11-10）
+
+检索 `moon search resource-schedule --limit 5` 后复核了相邻项目的公开说明。多资源、区间、预算和校验都存在生态先例。
+
+| 项目 | 公开能力 | 本项目的交付重点 |
+| --- | --- | --- |
+| [SlotPlan](https://github.com/cauchyQ/moonbit-slotplan) | 多资源预约、替代资源、容量日历、批量策略、取消与重新预约 | 输入整份基线与冻结项，在有限候选中优化总改动成本，并报告证明状态 |
+| [ContinuityForge](https://github.com/lllg123/ContinuityForge) | 多资源 RCPSP、前置约束、工期优化、独立校验与基准 | 使用同一批任务的已承诺候选作为基线，以保留安排为目标，输出逐任务变更 |
+| [moonbit-constraint](https://github.com/mjfmjf879/moonbit-constraint) | 通用有限域约束与排程建模 | 提供可直接接入的候选区间模型、修复目标和变更 JSON，承担独立维护成本 |
+
+这些是使用范围和目标的差别，无法据此证明生态中没有同类实现。上述项目用于比较，未移植其代码。以下保留原课表方向的调研记录。
+
 调研日期：2026-11-03。以下对照基于公开文档，不能证明其他实现不存在；提交前应再次检查。
 
 | 项目 | 已有能力 | MoonRoster 的定位 |

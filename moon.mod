@@ -12,4 +12,4 @@ keywords = [ "scheduling", "timetable", "constraint" ]
 
 preferred_target = "wasm"
 
-description = "A small, deterministic timetable scheduler for people and shared spaces."
+description = "Bounded minimum-change repair and independent validation of multi-resource plans."

@@ -1,5 +1,6 @@
 import {
   "2515050242/moonroster" @roster,
+  "2515050242/moonroster/repair",
 }
 
 supported_targets = "js"
