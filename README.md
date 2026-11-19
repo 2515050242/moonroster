@@ -1,17 +1,48 @@
 # 星序 Xingxu · 多资源计划修复库
 
-星序的 `repair` 包用于修复已发布但受资源故障、容量变化或依赖冲突影响的计划。输入原方案、冻结任务、可选调整及改动成本，库返回可行的调整清单。完整搜索结束后给出最低成本，搜索受限时报告已找到的方案及成本下界。
+星序面向需要在资源故障、容量变化或任务延期后调整既有计划的排程系统开发者。独立的 MoonBit `repair` 包提供求解与校验接口，也可通过 JSON CLI 调用。
 
-资源由调用者定义，可以是机器、人员、算力或装卸能力。每个资源有逐时容量，每个选项可以同时占用多种资源。校验接口也可单独检查外部给出的安排，指出冻结、前置依赖或容量冲突。
+调用方为每项任务提供原选项、候选区间、同时占用的资源、前置任务及改动权重。求解器为每项任务选择一个候选，遵守逐时容量、前置依赖和冻结约束，并以所有变动任务的权重之和为目标。输出包含候选索引、改动清单和搜索结论。搜索穷尽时可证明最优或无解，预算耗尽时区分已有可行方案与结果未知。校验接口接收外部候选索引，检查约束并重新计算成本。
 
-## 运行计划修复
+## 示例：码头泊位争用
+
+本例对应 `examples/repair/dispatch.json`。每个 tick 表示相同长度的时间单位，任务区间左闭右开。
+
+| 任务 | 原候选 0 | 替代候选 1 | 每刻需求 | 调整一次的成本 |
+| --- | --- | --- | --- | --- |
+| 常规订单 routine | [0,1) | [1,2) | 泊位 1、人力 1 | 2 |
+| 优先订单 priority | [0,1) | [2,3) | 泊位 1、人力 2 | 9 |
+
+全程泊位容量为 1、人力容量为 2。两项任务的 `baseline` 都是 0，`frozen` 均为 false。`after` 为空，表示本例没有前置任务。成本权重由调用者给定，不代表系统自动推断的经济损失。
+
+泊位容量为 1，两笔订单原定都占用 `[0,1)`。常规订单可以移到 `[1,2)`，成本为 2。优先订单可以移到 `[2,3)`，成本为 9。两个订单还分别需要 1 和 2 单位装卸人力。
+
+```sh
+moon build cmd/web --target js --release
+node cmd/solve.mjs --audit examples/repair/dispatch.json examples/repair/dispatch-baseline.json
+node cmd/solve.mjs --repair examples/repair/dispatch.json
+```
+
+第一条 CLI 命令预期退出码为 1，输出：
+
+```json
+{"status":"conflict","kind":"capacity","resource":"dock","tick":0,"used":2,"available":1}
+```
+
+第二条 CLI 命令预期退出码为 0，输出：
+
+```json
+{"status":"optimal","choices":[1,0],"cost":2,"attempts":5,"lower_bound":2,"changes":[{"task":"routine","before":0,"after":1,"cost":2}]}
+```
+
+`choices` 按任务输入顺序排列，索引从 0 开始。结果把常规订单移到第 1 刻，优先订单留在原时段。只移动优先订单需付 9，两笔都移动需付 11，因此 2 是这一组候选中的最低成本。该例使用合成数据。
+
+## 其他修复示例
 
 ```sh
 moon build cmd/web --target js --release
 node cmd/solve.mjs --repair examples/repair/equipment.json
 node cmd/solve.mjs --repair examples/repair/release.json
-node cmd/solve.mjs --repair examples/repair/dispatch.json
-node cmd/solve.mjs --audit examples/repair/dispatch.json examples/repair/dispatch-baseline.json
 ```
 
 三个示例分别覆盖设备故障时改用备用设备、软件发布前置任务延迟、码头争抢时优先保留高代价订单。审计命令复核码头原方案，预期返回容量冲突和退出码 1。使用 [接口、示例结果和限制](docs/repair.md) 接入其他 MoonBit 工程。
