@@ -80,3 +80,27 @@ fn prepare(problem : Problem) -> Result[Prepared, String] {
   }
   Ok({ demands, before, after, })
 }
+
+///|
+// Every interval has positive duration, so a precedence cycle is impossible.
+fn has_precedence_cycle(prepared : Prepared) -> Bool {
+  let remaining = prepared.before.map(edges => edges.length())
+  let ready : Array[Int32] = []
+  for i, count in remaining {
+    if count == 0 {
+      ready.push(i)
+    }
+  }
+  let mut visited = 0
+  while visited < ready.length() {
+    let i = ready[visited]
+    visited += 1
+    for successor in prepared.after[i] {
+      remaining[successor] -= 1
+      if remaining[successor] == 0 {
+        ready.push(successor)
+      }
+    }
+  }
+  visited != remaining.length()
+}

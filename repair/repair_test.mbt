@@ -36,12 +36,29 @@ test "weighted repair finds cheaper changes and labels interrupted search" {
   guard full.outcome is Optimal(plan) else { fail("Expected an optimum") }
   assert_eq(plan.choices, [1, 0])
   assert_eq(plan.cost, 2)
+  assert_eq(full.lower_bound, 2)
   assert_true(@repair.audit(dispatch(100), plan.choices) is Valid(2))
   let limited = @repair.solve(dispatch(3))
   guard limited.outcome is Feasible(plan) else { fail("Expected an incumbent") }
   assert_eq(plan.cost, 9)
   assert_eq(limited.attempts, 3)
+  assert_true(limited.lower_bound <= 2)
   assert_true(@repair.solve(dispatch(1)).outcome is Unknown)
+}
+
+///|
+test "a precedence cycle proves infeasible even with one search attempt allowed" {
+  let problem = {
+    ..dispatch(1),
+    tasks: [
+      make_task("first", 1, false, ["third"], 1),
+      make_task("second", 1, false, ["first"], 1),
+      make_task("third", 1, false, ["second"], 1),
+    ],
+  }
+  let report = @repair.solve(problem)
+  assert_true(report.outcome is Infeasible)
+  assert_eq(report.attempts, 0)
 }
 
 ///|

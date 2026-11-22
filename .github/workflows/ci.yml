@@ -28,7 +28,7 @@ jobs:
       - name: Run tests
         run: moon test --target wasm,wasm-gc,js --deny-warn
       - name: Build browser engine
-        run: moon build cmd/web --target js --release
+        run: moon build cmd/web --target js --release --deny-warn
       - name: Run example
         run: moon run cmd/main
       - name: Verify file CLI and shipped scenarios

@@ -95,6 +95,9 @@ pub fn solve(problem : Problem) -> Report {
     Err(message) =>
       return { outcome: Invalid(message), attempts: 0, lower_bound: 0, }
   }
+  if has_precedence_cycle(prepared) {
+    return { outcome: Infeasible, attempts: 0, lower_bound: 0, }
+  }
   let domains : Array[Array[Int32]] = problem.tasks.map(_ => [])
   let order : Array[Int32] = []
   let suffix = Array::make(problem.tasks.length() + 1, 0)
@@ -146,5 +149,9 @@ pub fn solve(problem : Problem) -> Report {
     None if s.stopped => Unknown
     None => Infeasible
   }
-  { outcome, attempts: s.attempts, lower_bound: suffix[0], }
+  let lower_bound = match outcome {
+    Optimal(plan) => plan.cost
+    _ => suffix[0]
+  }
+  { outcome, attempts: s.attempts, lower_bound, }
 }

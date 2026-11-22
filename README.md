@@ -109,8 +109,8 @@ node cmd/solve.mjs examples/activities.json
 核心求解器由 MoonBit 编写，浏览器使用 MoonBit 编译的 JavaScript 模块。网页仅提供数据录入、展示和本地导入导出；求解在核心中执行。
 
 ```sh
-moon check --target wasm,wasm-gc,js --deny-warn
-moon test --target wasm,wasm-gc,js --deny-warn
+moon check --target 'wasm,wasm-gc,js' --deny-warn
+moon test --target 'wasm,wasm-gc,js' --deny-warn
 moon build cmd/web --target js --release
 moon fmt --check
 moon run verify_examples.mbtx --deny-warn

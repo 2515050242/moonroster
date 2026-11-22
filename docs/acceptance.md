@@ -4,15 +4,15 @@
 
 ## 从 GitHub 复现
 
-使用 moonc 0.10.16 或更高版本和 Node.js 20 或更高版本。在新工作目录执行：
+使用 MoonBit 稳定工具链和 Node.js 22。本项目本地复核用 moonc 0.10.20，高于十月指南的 0.10.16。在新工作目录执行：
 
 ```sh
 git clone https://github.com/2515050242/moonroster.git
 cd moonroster
 moon version --all
 moon fmt --check
-moon check --target wasm,wasm-gc,js --deny-warn
-moon test --target wasm,wasm-gc,js --deny-warn
+moon check --target 'wasm,wasm-gc,js' --deny-warn
+moon test --target 'wasm,wasm-gc,js' --deny-warn
 moon build cmd/web --target js --release --deny-warn
 moon run verify_examples.mbtx --deny-warn
 ```
@@ -24,7 +24,7 @@ moon run verify_examples.mbtx --deny-warn
 从 [Mooncakes 模块页](https://mooncakes.io/docs/2515050242/moonroster) 核对可用版本。在调用方模块根目录安装依赖：
 
 ```sh
-moon add 2515050242/moonroster@0.1.0
+moon add 2515050242/moonroster@0.1.1
 ```
 
 在调用方的 `moon.pkg` 中导入 `"2515050242/moonroster/repair" @repair`。使用 `@repair.solve(problem)` 求解，再用 `@repair.audit(problem, choices)` 复核方案。字段、状态和规模限制见 [接口文档](repair.md)，最小类型化调用见 [可执行示例](../repair/README.mbt.md)。
@@ -41,7 +41,7 @@ moon add 2515050242/moonroster@0.1.0
 | README | [安装、命令及完整码头输入输出](../README.md) |
 | CI | [Actions](https://github.com/2515050242/moonroster/actions)覆盖格式、检查、测试、构建和 CLI 复现 |
 | 可运行示例 | [修复 JSON](../examples/repair)与 [MoonBit 最小调用](../repair/README.mbt.md) |
-| 测试覆盖 | 三目标各 32 项。修复测试含 64 个小实例枚举对照、预算中断、冻结、依赖、容量与异常输入 |
+| 测试覆盖 | 三目标各 33 项。修复测试含 64 个小实例枚举对照、预算中断、冻结、前置环、容量与异常输入 |
 | Mooncakes | [注册中心模块页](https://mooncakes.io/docs/2515050242/moonroster)及上面的安装命令 |
 | 许可证与来源 | [Apache-2.0](../LICENSE)、[来源与维护记录](provenance.md)、[同类项目](related-work.md) |
 

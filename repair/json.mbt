@@ -62,13 +62,7 @@ fn plan_json(
     "choices": Json(plan.choices),
     "cost": Json(plan.cost),
     "attempts": Json(report.attempts),
-    "lower_bound": Json(
-      if status == "optimal" {
-        plan.cost
-      } else {
-        report.lower_bound
-      },
-    ),
+    "lower_bound": Json(report.lower_bound),
     "changes": Json(changes),
   }
   value.stringify()
